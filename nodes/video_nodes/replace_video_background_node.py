@@ -2,6 +2,7 @@ import os
 import uuid
 import requests
 from ..common import (
+    bria_json_headers,
     normalize_images_input,
     poll_status_until_completed,
     upload_pil_image_to_temp
@@ -124,10 +125,7 @@ class ReplaceVideoBackgroundNode():
                 "preserve_audio": preserve_audio,
             }
 
-            headers = {
-                "Content-Type": "application/json",
-                "api_token": f"{api_key}",
-            }
+            headers = bria_json_headers(api_key)
 
             response = requests.post(self.api_url, json=payload, headers=headers)
 

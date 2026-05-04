@@ -2,6 +2,7 @@ import os
 import uuid
 import requests
 from ..common import (
+    bria_json_headers,
     poll_status_until_completed,
 )
 from .video_utils import upload_video_to_s3
@@ -83,11 +84,8 @@ class GreenScreenVideoNode():
                 "output_container_and_codec": output_container_and_codec,
                 "preserve_audio": preserve_audio,
             }
+            headers = bria_json_headers(api_key)
 
-            headers = {
-                "Content-Type": "application/json",
-                "api_token": f"{api_key}",
-            }
 
             response = requests.post(self.api_url, json=payload, headers=headers)
 

@@ -6,7 +6,8 @@ import base64
 from torchvision.transforms import ToPILImage
 import requests
 import time
-
+import os
+import uuid
 
 BRIA_COMFYUI_USER_AGENT = "bria/ComfyUI"
 
@@ -208,3 +209,84 @@ def normalize_images_input(images):
         raise ValueError(f"Unsupported input type: {type(images)}")
 
    
+
+_EXT_TO_PIL_AND_MIME = {
+    ".png": ("PNG", "image/png"),
+    ".jpg": ("JPEG", "image/jpeg"),
+    ".jpeg": ("JPEG", "image/jpeg"),
+    ".webp": ("WEBP", "image/webp"),
+    ".gif": ("GIF", "image/gif"),
+    ".bmp": ("BMP", "image/bmp"),
+    ".tif": ("TIFF", "image/tiff"),
+    ".tiff": ("TIFF", "image/tiff"),
+}
+
+
+def _pil_format_and_mime_for_filename(file_name):
+    """Return (pil_format, content_type, file_name_with_ext). Uses .png only when there is no extension."""
+    base = file_name.strip() if file_name else ""
+    if not base:
+        base = f"{uuid.uuid4()}_background"
+    root, ext = os.path.splitext(base)
+    ext = ext.lower()
+    if not ext:
+        ext = ".png"
+        base = f"{root}{ext}"
+    elif ext not in _EXT_TO_PIL_AND_MIME:
+        ext = ".png"
+        base = f"{root}{ext}"
+    pil_format, mime = _EXT_TO_PIL_AND_MIME[ext]
+    return pil_format, mime, base
+
+
+def upload_pil_image_to_temp(pil_image, api_token, file_name=None):
+    """
+    Request an anonymous presigned PUT URL, upload the image bytes, return the public temp URL.
+
+    ``file_name`` keeps its extension for format and Content-Type; if it has no extension, ``.png``
+    is appended. Matches platform POST /upload-image/anonymous/presigned-url (same pattern as video).
+    """
+    api_url = "https://platform.prod.bria-api.com/upload-image/anonymous/presigned-url"
+    headers = {"Content-Type": "application/json"}
+    if api_token:
+        headers["api_token"] = api_token
+        # Hyphenated header survives proxies that strip underscores (e.g. nginx default).
+        headers["X-Api-Token"] = api_token
+
+    pil_format, content_type, file_name = _pil_format_and_mime_for_filename(file_name or "")
+
+    payload = {
+        "file_name": file_name,
+        "content_type": content_type,
+    }
+
+    buf = io.BytesIO()
+    to_save = pil_image
+    if pil_format == "JPEG" and to_save.mode in ("RGBA", "P"):
+        to_save = to_save.convert("RGB")
+    save_kwargs = {}
+    if pil_format == "JPEG":
+        save_kwargs["quality"] = 95
+    to_save.save(buf, format=pil_format, **save_kwargs)
+    buf.seek(0)
+    image_bytes = buf.read()
+    response = requests.post(api_url, json=payload, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Failed to get image presigned URL: {response.status_code} {response.text}")
+
+    response_data = response.json()
+    image_url = response_data.get("image_url")
+    upload_url = response_data.get("upload_url")
+
+    if not image_url or not upload_url:
+        raise Exception(f"Invalid response from image presigned URL API: {response_data}")
+
+    upload_response = requests.put(
+        upload_url,
+        data=image_bytes,
+        headers={"Content-Type": content_type},
+    )
+    if upload_response.status_code not in (200, 204):
+        raise Exception(f"Failed to upload image to S3: {upload_response.status_code}")
+
+    return image_url

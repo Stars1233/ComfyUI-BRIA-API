@@ -107,13 +107,29 @@ These nodes create high-quality product images for eCommerce workflows.
 | **ShotByText**         | Modifies an image's background by providing a text prompt. Powered by BRIA's ControlNet Background-Generation. |
 | **ShotByImage**        | Modifies an image's background by providing a reference image. Uses BRIA's ControlNet Background-Generation and Image-Prompt. |
 
+## Video Editing Nodes
+
+These nodes perform high-quality edits for a given video.
+
+| Node | Description |
+|------|-------------|
+| **Bria Video Remove Background** | Remove the background from a video. |
+| **Bria Video Green Screen** | Replace the background of a video with a Chroma-green color. |
+| **Bria Video Replace Background** | Replaces the background of a video with a user-provided image or video |
+| **Bria SolidColor Background Video** | Replace the background of a video with a solid color. |
+| **Bria Video Increase Resolution** | Upscales video resolution |
+| **Bria Video Erase Elements** | Erases selected elements from the video using a mask |
+| **Bria Video Mask By Prompt** | Generates a mask video using a text prompt describing what to mask. |
+| **Bria Video Mask By Key Points** | Generates a mask video using key-points guidance |
+
+
 ## Attribution Node
 
 | Node                          | Description |
 |-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribution By Image Node** | This node shares generated images via API for Bria to pay attribution to the data owners who contributed to the generation. Once the images are shared with Bria, Bria calculates the attribution, completes the payment on behalf of the user, and erases the images immediately. This node should be included in any workflow using nodes of Bria’s Models (not necessary for Bria’s API nodes). You can also refer to the [**API documentation**]( https://docs.bria.ai/bria-attribution-service/other/postattributionbyimage) |
 
-
+An example workflow in the [workflows](workflows) folder is **`Video_Editig_Workflow.json`**, which wires several of these nodes together. Video API details are covered in the [**BRIA API documentation**](https://docs.bria.ai/).
 
 
 # Installation

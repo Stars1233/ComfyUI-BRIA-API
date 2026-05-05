@@ -107,26 +107,27 @@ These nodes create high-quality product images for eCommerce workflows.
 | **ShotByText**         | Modifies an image's background by providing a text prompt. Powered by BRIA's ControlNet Background-Generation. |
 | **ShotByImage**        | Modifies an image's background by providing a reference image. Uses BRIA's ControlNet Background-Generation and Image-Prompt. |
 
+## Video Editing Nodes
+
+These nodes perform high-quality edits for a given video.
+
+| Node | Description |
+|------|-------------|
+| **Bria Video Remove Background** | Remove the background from a video. |
+| **Bria Video Green Screen** | Replace the background of a video with a Chroma-green color. |
+| **Bria Video Replace Background** | Replaces the background of a video with a user-provided image or video |
+| **Bria SolidColor Background Video** | Replace the background of a video with a solid color. |
+| **Bria Video Increase Resolution** | Upscales video resolution |
+| **Bria Video Erase Elements** | Erases selected elements from the video using a mask |
+| **Bria Video Mask By Prompt** | Generates a mask video using a text prompt describing what to mask. |
+| **Bria Video Mask By Key Points** | Generates a mask video using key-points guidance |
+
+
 ## Attribution Node
 
 | Node                          | Description |
 |-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribution By Image Node** | This node shares generated images via API for Bria to pay attribution to the data owners who contributed to the generation. Once the images are shared with Bria, Bria calculates the attribution, completes the payment on behalf of the user, and erases the images immediately. This node should be included in any workflow using nodes of Bria’s Models (not necessary for Bria’s API nodes). You can also refer to the [**API documentation**]( https://docs.bria.ai/bria-attribution-service/other/postattributionbyimage) |
-
-## Video Editing Nodes
-
-These nodes call BRIA’s **video editing** APIs. They accept a **foreground video** as a **public URL**. Outputs are typically a **STRING** with the processed **HTTPS video URL**
-
-| Node | Description |
-|------|-------------|
-| **Bria Video Remove Background** | Removes the video background (`POST /v2/video/edit/remove_background`). Supports **background color** (including **Transparent**); pick a codec that supports alpha when you need transparency (for example **webm_vp9**). |
-| **Bria Video Green Screen** | Chroma-key style background removal (`POST /v2/video/edit/green_screen`) with **green shade** presets (broadcast green, chroma green, blue screen). Output is a processed video with a solid-color background. |
-| **Bria Video Replace Background** | Composites a new **image or video** background (`POST /v2/video/edit/replace_background`). Supply **`background_url`** (HTTPS) and/or connect **`background_image`** from nodes such as **Generate Image** or **Load Image**. **Background and foreground aspect ratios should match**—otherwise the API may return **`BACKGROUND_ASPECT_RATIO_MISMATCH`** (the node surfaces foreground vs. background aspect ratio details when available). |
-| **Bria SolidColor Background Video** | Applies a **solid color** background to the video via the same remove-background pipeline, for cases where you want an explicit fill instead of transparency. |
-| **Bria Video Mask By Prompt** | Generates a **mask video** from the source video using a **text prompt** describing what to mask. |
-| **Bria Video Mask By Key Points** | Generates a **mask video** using **key-point** guidance instead of a free-text prompt. |
-| **Bria Video Increase Resolution** | Upscales video resolution via the increase-resolution video edit API. |
-| **Bria Video Erase Elements** | Erases selected elements from the video; optional **mask video URL** for targeted erasing. |
 
 An example workflow in the [workflows](workflows) folder is **`Video_Editig_Workflow.json`**, which wires several of these nodes together. Video API details are covered in the [**BRIA API documentation**](https://docs.bria.ai/).
 

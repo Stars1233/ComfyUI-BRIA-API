@@ -250,8 +250,6 @@ def upload_pil_image_to_temp(pil_image, api_token, file_name=None):
     headers = {"Content-Type": "application/json"}
     if api_token:
         headers["api_token"] = api_token
-        # Hyphenated header survives proxies that strip underscores (e.g. nginx default).
-        headers["X-Api-Token"] = api_token
 
     pil_format, content_type, file_name = _pil_format_and_mime_for_filename(file_name or "")
 

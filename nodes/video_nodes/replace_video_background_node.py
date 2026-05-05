@@ -38,7 +38,6 @@ class ReplaceVideoBackgroundNode():
                     "tooltip": "Public HTTPS image or video URL, if not using background_image.",
                 }),
                 "background_image": ("IMAGE",),
-                "background_type": (["image", "video"], {"default": "image"}),
                 "output_container_and_codec": ([
                     "mp4_h264",
                     "mp4_h265",
@@ -82,7 +81,6 @@ class ReplaceVideoBackgroundNode():
         video_url,
         background_url="",
         background_image=None,
-        background_type="image",
         output_container_and_codec="mp4_h264",
         preserve_audio=True,
     ):
@@ -120,7 +118,6 @@ class ReplaceVideoBackgroundNode():
             payload = {
                 "video": input_video_url,
                 "background_url": bg,
-                "background_type": background_type,
                 "output_container_and_codec": output_container_and_codec,
                 "preserve_audio": preserve_audio,
             }
